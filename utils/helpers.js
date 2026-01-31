@@ -15,3 +15,8 @@ export const formatDate = (isoString) => {
     minute: '2-digit'
   })
 }
+
+export function maskName(name) {
+  if (!name) return ''
+  return '*'.repeat(name.length)
+}
