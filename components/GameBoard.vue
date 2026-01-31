@@ -185,7 +185,6 @@ import { useGameStore, useErrorStore } from '~/store/index.js'
 import { formatTime, formatDate } from '@/utils/helpers'
 import { useHistoryStore } from '@/store/history.js'
 import { useSettingsStore } from '@/store/setting.js'
-import { useDebounceFn } from '@vueuse/core'
 
 export default {
   setup() {
@@ -281,11 +280,7 @@ export default {
       })
     },
     getImageUrl(imageName) {
-      if (!this.settings.hardMode) {
-        return new URL(`/assets/images/characters/syoubufuku/${imageName}`, import.meta.url).href
-      } else {
-        return new URL(`/assets/images/characters/seifuku/${imageName}`, import.meta.url).href
-      }
+      return new URL(`/assets/images/characters/syoubufuku/${imageName}`, import.meta.url).href
     },
     shuffleCharacters() {
       for (let i = this.characters.length - 1; i > 0; i--) {
@@ -309,7 +304,6 @@ export default {
       const userAnswer = this.userInput.trim()
 
       if (validAnswers.includes(userAnswer.toLowerCase())) {
-      if (validAnswers.includes(userAnswer.toLowerCase())) {
         this.correctCount++
         this.nextCharacter()
       } else {
@@ -325,7 +319,7 @@ export default {
         })
         this.handleError()
       }
-    }, 300),
+    },
     handleError() {
       if (this.settings.allowContinueOnError) {
         this.nextCharacter()
@@ -335,7 +329,6 @@ export default {
       }
     },
     nextCharacter() {
-      clearInterval(this.timerInterval)
       this.showingHint = false
       this.isHintDisabled = false
       this.hintText = ''
@@ -354,12 +347,8 @@ export default {
     endGame() {
       this.displayTime = false
       this.totalTime = Date.now() - this.startTime
-      this.currentCharacter = null
 
       this.currentIndex = this.characters.length
-
-      clearInterval(this.timerInterval)
-      this.timeLeft = 0
 
       const gameStore = useGameStore()
       gameStore.addHistory({
