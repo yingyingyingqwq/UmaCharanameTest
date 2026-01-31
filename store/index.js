@@ -38,7 +38,7 @@ export const useErrorStore = defineStore('errors', {
     addError(error) {
       this.errors.push({
         ...error,
-        skipped: error.skipped || false // 新增跳过状态
+        skipped: error.skipped || false
       })
     }
   },

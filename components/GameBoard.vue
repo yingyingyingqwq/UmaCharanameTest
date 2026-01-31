@@ -1,155 +1,181 @@
 <template>
   <div class="game-container">
-    <div v-if="!gameStarted" class="start-screen">
-      <h2>{{ mode === 'normal' ? '马批浓度测试器' : '马批浓度测试器 - 声优吃模式' }}</h2>
-      <div class="settings" v-if="!gameStarted">
-        <div class="checkbox-container">
-          <div><label class="ios-checkbox green">
-              <input type="checkbox" v-model="settings.random30" />
-              <div class="checkbox-wrapper">
-                <div class="checkbox-bg"></div>
-                <svg fill="none" viewBox="0 0 24 24" class="checkbox-icon">
-                  <path stroke-linejoin="round" stroke-linecap="round" stroke-width="3" stroke="currentColor"
-                    d="M4 12L10 18L20 6" class="check-path"></path>
-                </svg>
+    <!-- Start Screen -->
+    <transition name="fade" mode="out-in">
+      <div v-if="!gameStarted" class="screen start-screen" key="start">
+        <div class="card start-card">
+          <h2 class="game-title">{{ mode === 'normal' ? '全马娘角色名挑战' : '全马娘声优名挑战' }}</h2>
+          
+          <div class="settings">
+            <div class="setting-group">
+              <div class="setting-title">题目数量</div>
+              <div class="segmented-control">
+                <input type="radio" id="count-all" :value="false" v-model="settings.random30">
+                <input type="radio" id="count-30" :value="true" v-model="settings.random30">
+                
+                <label for="count-all" class="segment-label">全部角色</label>
+                <label for="count-30" class="segment-label">随机30个</label>
+                
+                <div class="segment-indicator"></div>
               </div>
-            </label>
-            随机30个角色
-          </div>
-          <div>
-            <label class="ios-checkbox green">
-              <input type="checkbox" v-model="settings.allowContinueOnError" />
-              <div class="checkbox-wrapper">
-                <div class="checkbox-bg"></div>
-                <svg fill="none" viewBox="0 0 24 24" class="checkbox-icon">
-                  <path stroke-linejoin="round" stroke-linecap="round" stroke-width="3" stroke="currentColor"
-                    d="M4 12L10 18L20 6" class="check-path"></path>
-                </svg>
+            </div>
+
+            <div class="setting-group">
+              <div class="setting-title">模式选择</div>
+              <div class="segmented-control">
+                <input type="radio" id="mode-challenge" :value="true" v-model="settings.allowContinueOnError">
+                <input type="radio" id="mode-practice" :value="false" v-model="settings.allowContinueOnError">
+                
+                <label for="mode-challenge" class="segment-label">挑战模式</label>
+                <label for="mode-practice" class="segment-label">练习模式</label>
+                
+                <div class="segment-indicator"></div>
               </div>
-            </label>
-            不校验答案
+            </div>
           </div>
-        </div>
-      </div>
-      <button @click="startGame">开始挑战</button>
-    </div>
 
-    <template v-else>
-
-      <TimerDisplay v-if="gameStarted & displayTime" :startTime="startTime" />
-
-      <div v-if="gameStarted && currentCharacter" class="progress-container">
-        <div class="progress-text">{{ progressText }}</div>
-        <div class="progress-bar">
-          <div class="progress-fill" :style="{
-            width: progressPercentage + '%',
-            backgroundColor: subColor
-          }"></div>
+          <button @click="startGame" class="btn-primary start-btn">开始挑战</button>
         </div>
       </div>
 
-      <transition name="fade" mode="out-in">
-        <div v-if="currentCharacter" key="game" class="character-card">
-          <li class="charaContainer" style="transition-delay: 0s;"><a data-v-2ed22295="" data-v-edf74022=""
-              class="charaALink" v-bind:style="{ '--color-main': mainColor, '--color-sub': subColor }">
-              <div class="charaInner">
-                <dl class="charaDl">
-                  <dt class="charaDt">
-                    <div class="dt-img">
-                      <picture class="img-loaded">
-                        <img :src="getImageUrl(currentCharacter.image)" width="100%">
-                      </picture>
-                    </div>
-                    <div class="dt-bg">
-                      <p class="font-weight-bold">{{ mode === 'normal' ? 'Umamusume' : currentCharacter.names.en }}</p>
-                    </div>
-                  </dt>
-                  <dd class="charaDd">
-                    <p class="name">
-                    <div class="input-container" v-if="mode === 'normal'">
-                      <div>
-                        <input placeholder="中文名/日文名/英文名" class="input-field" type="text" v-model="userInput"
-                          @keyup.enter="checkAnswer" :class="{ 'error-shake': isError }">
-                        <label for="input-field" class="input-label"></label>
-                        <span class="input-highlight" v-bind:style="{ 'background-color': subColor }"></span>
-                      </div>
-                    </div>
-                    <div v-if="mode === 'seiyuu'">
-                      {{ currentCharacter.names.zh }}
-                    </div>
-                    </p>
-                    <div class="cv" v-if="mode === 'seiyuu'">
-                      <p class="charaP">
-                        <span class="charaSpan">CV:</span>
-                        <input placeholder="中文名/日文名/英文名" class="input-field" type="text" v-model="userInput"
-                          @keyup.enter="checkAnswer" :class="{ 'error-shake': isError }"
-                          style="text-align: left; color: #505050;">
-                        <label for="input-field" class="input-label"></label>
-                        <span class="input-highlight" v-bind:style="{ 'background-color': subColor }"></span>
-                      </p>
-                    </div>
-                  </dd>
-                </dl>
-              </div>
-            </a>
-          </li>
-          <div class="button-container" v-bind:style="{ display: settings.allowContinueOnError ? 'block' : 'flex' }">
-            <button v-if="!settings.allowContinueOnError" @click="skipCharacter" class="skip-button">跳过</button>
-            <button @click="checkAnswer" class="submit-button">提交</button>
-          </div>
-
-          <div v-if="!settings.allowContinueOnError" class="hint-button" @click="showHint" :disabled="isHintDisabled">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-              <path fill="currentColor"
-                d="M10.6 16q0-2.025.363-2.912T12.5 11.15q1.025-.9 1.563-1.562t.537-1.513q0-1.025-.687-1.7T12 5.7q-1.275 0-1.937.775T9.125 8.05L6.55 6.95q.525-1.6 1.925-2.775T12 3q2.625 0 4.038 1.463t1.412 3.512q0 1.25-.537 2.138t-1.688 2.012Q14 13.3 13.738 13.913T13.475 16zm1.4 6q-.825 0-1.412-.587T10 20t.588-1.412T12 18t1.413.588T14 20t-.587 1.413T12 22" />
-            </svg>
-          </div>
-          <div v-if="showingHint" class="hint-popup" :class="{ show: showingHint }">
-            {{ hintText }}
+      <!-- Game Screen -->
+      <div v-else-if="currentIndex < characters.length" class="screen game-screen" key="game">
+        <div class="game-header">
+          <div class="progress-wrapper">
+            <div class="progress-info">
+              <span>进度: {{ progressText }}</span>
+              <TimerDisplay v-if="displayTime" :startTime="startTime" />
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" :style="{
+                width: progressPercentage + '%',
+                backgroundColor: subColor || 'var(--primary-color)'
+              }"></div>
+            </div>
           </div>
         </div>
 
-        <div v-else class="result-screen">
-          <h3>挑战完成！</h3>
-          <p>用时：{{ formattedTime }}</p>
-          <p>正确率：{{ accuracy }}%</p>
-          <p>正确数：{{ correctCount }}/{{ this.characters.length }}</p>
+        <div class="character-card-wrapper">
+          <div class="character-card" :style="{ '--theme-color': mainColor || '#42b983', '--sub-theme-color': subColor || '#42b983' }">
+            
+            <!-- New Character Display Card -->
+            <div class="character-display-card">
+              <div class="card-content-wrapper">
+                <div class="card-main-visual" :style="{ backgroundColor: mainColor }">
+                  <img :src="getImageUrl(currentCharacter.image)" :alt="currentCharacter.names.en" class="character-img-display">
+                </div>
+                
+                <div class="card-info-box" :style="{ borderBottomColor: subColor || '#0056b3' }">
+                  <div class="info-name-row">
+                    <span class="info-name">{{ mode === 'normal' ? '? ? ?' : currentCharacter.names.zh }}</span>
+                  </div>
+                  <div class="info-cv-row">
+                    <span class="info-cv">CV: {{ mode === 'seiyuu' ? '? ? ?' : currentCharacter.seiyuu.zh }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="visual-side-strip-container">
+                <div class="visual-side-strip">
+                  <div class="vertical-text" :style="{ color: mainColor }">
+                    {{ mode === 'normal' ? 'Umamusume' : currentCharacter.names.en }}
+                  </div>
+                </div>
+                <div class="visual-accent-strip" :style="{ backgroundColor: subColor || '#0056b3' }"></div>
+              </div>
+            </div>
+
+            <div class="card-content">
+              <div class="input-section">
+                <div class="input-group" :class="{ 'error': isError }">
+                  <label v-if="mode === 'seiyuu'" class="seiyuu-label">
+                    {{ currentCharacter.names.zh }} <span class="cv-tag">CV</span>
+                  </label>
+                  
+                  <input 
+                    type="text" 
+                    v-model="userInput" 
+                    @keyup.enter="checkAnswer"
+                    class="game-input"
+                    :placeholder="mode === 'normal' ? '输入角色名 (中/日/英)' : '输入声优名'"
+                    autofocus
+                    ref="answerInput"
+                  >
+                  <div class="input-border" :style="{ backgroundColor: subColor || 'var(--primary-color)' }"></div>
+                </div>
+              </div>
+
+              <div class="actions">
+                <button v-if="!settings.allowContinueOnError" @click="skipCharacter" class="btn-secondary skip-btn">
+                  跳过
+                </button>
+                <button @click="checkAnswer" class="btn-primary submit-btn" :style="{ backgroundColor: subColor || 'var(--primary-color)' }">
+                  提交
+                </button>
+              </div>
+              
+              <div class="hint-section" v-if="!settings.allowContinueOnError">
+                 <button class="hint-btn" @click="showHint" :disabled="isHintDisabled" title="提示">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                 </button>
+                 <div v-if="showingHint" class="hint-text">
+                   {{ hintText }}
+                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Result Screen -->
+      <div v-else class="screen result-screen" key="result">
+        <div class="card result-card">
+          <h2 class="result-title">挑战结束！</h2>
+          
+          <div class="score-section">
+            <div class="score-label">最终得分</div>
+            <div class="score-value">{{ accuracy }}</div>
+            <div class="score-rank">{{ getRank }}</div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-label">用时</span>
+              <span class="stat-value">{{ formattedTime }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">正确率</span>
+              <span class="stat-value">{{ accuracy }}%</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">正确数</span>
+              <span class="stat-value">{{ correctCount }}/{{ characters.length }}</span>
+            </div>
+          </div>
+
+          <div class="result-actions">
+            <button @click="restartGame" class="btn-primary">再来一次</button>
+            <button @click="goHome" class="btn btn-secondary">返回首页</button>
+          </div>
 
           <div class="error-list" v-if="errorStore.errorCount > 0">
-            <h4>错误答案</h4>
-            <div v-for="(error, index) in errorStore.errors" :key="index" class="error-item"
-              :class="{ 'skipped': error.skipped }">
-              <div class="error-card">
-                <div class="error-image">
-                  <img :src="getImageUrl(error.image)" width="60">
+            <h4>错误回顾</h4>
+            <div class="error-grid">
+              <div v-for="(error, index) in errorStore.errors" :key="index" class="error-card-item">
+                <div class="error-img-wrapper">
+                   <img :src="getImageUrl(error.image)" class="error-img">
                 </div>
-                <div class="error-info">
-                  <p v-if="error.mode === 'normal'">角色：{{ error.characterName }}</p>
-                  <p>
-                    你的答案：
-                    <span class="wrong-answer" :data-skipped="error.skipped">
-                      {{ error.skipped ? '（已跳过）' : (error.userAnswer || "（未填写）") }}
-                    </span>
-                  </p>
-                  <p>正确答案：<span class="correct-answer">{{ error.correctAnswer }}</span></p>
+                <div class="error-details">
+                  <p class="error-name">{{ error.characterName }}</p>
+                  <p class="error-answer wrong">你的答案: {{ error.skipped ? '（已跳过）' : (error.userAnswer || "（未填写）") }}</p>
+                  <p class="error-answer correct">正确答案: {{ error.correctAnswer }}</p>
                 </div>
               </div>
             </div>
           </div>
-
-          <div class="history-list">
-            <h4>历史记录</h4>
-            <div v-for="(record, index) in history.records" :key="index" class="history-item">
-              <p>{{ formatDate(record.timestamp) }}</p>
-              <p>模式：{{ record.mode === 'normal' ? '角色模式' : '声优模式' }}</p>
-              <p>用时：{{ formatTime(record.time) }}</p>
-              <p>正确率：{{ record.accuracy }}%</p>
-              <p>正确数：{{ record.correctCount }}/{{ record.charaTotal }}</p>
-            </div>
-          </div>
         </div>
-      </transition>
-    </template>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -165,7 +191,8 @@ export default {
     const history = useHistoryStore()
     const settings = useSettingsStore()
     const errorStore = useErrorStore()
-    return { history, settings, errorStore }
+    const router = useRouter()
+    return { history, settings, errorStore, router }
   },
   components: {
     TimerDisplay
@@ -190,6 +217,7 @@ export default {
       isError: false,
       showingHint: false,
       hintText: '',
+      isHintDisabled: false
     }
   },
   computed: {
@@ -200,22 +228,30 @@ export default {
       return formatTime(this.totalTime)
     },
     accuracy() {
+      if (this.characters.length === 0) return 0
       return Math.round((this.correctCount / this.characters.length) * 100)
     },
-    correctCount() {
-      return this.correctCount
-    },
     mainColor() {
-      return this.currentCharacter.mainColor
+      return this.currentCharacter ? this.currentCharacter.mainColor : '#42b983'
     },
     subColor() {
-      return this.currentCharacter.subColor
+      return this.currentCharacter ? this.currentCharacter.subColor : '#42b983'
     },
     progressPercentage() {
+      if (this.characters.length === 0) return 0
       return ((this.currentIndex + 1) / this.characters.length) * 100
     },
     progressText() {
       return `${this.currentIndex + 1}/${this.characters.length}`
+    },
+    getRank() {
+      const percentage = this.accuracy
+      if (percentage === 100) return 'S+'
+      if (percentage >= 95) return 'S'
+      if (percentage >= 90) return 'A'
+      if (percentage >= 80) return 'B'
+      if (percentage >= 60) return 'C'
+      return 'D'
     }
   },
   methods: {
@@ -234,6 +270,14 @@ export default {
       this.displayTime = true
       this.errorStore.clearErrors()
       this.startTime = Date.now()
+      this.currentIndex = 0
+      this.correctCount = 0
+      this.userInput = ''
+      
+      // Focus input on next tick
+      this.$nextTick(() => {
+        if(this.$refs.answerInput) this.$refs.answerInput.focus()
+      })
     },
     getImageUrl(imageName) {
       return new URL(`/assets/images/characters/${imageName}`, import.meta.url).href
@@ -255,15 +299,14 @@ export default {
         target.zh,
         target.en,
         ...(target.aliases || []),
-      ].map(str => str.toLowerCase().trim())
+      ].map(str => str ? str.toLowerCase().trim() : '')
 
       const userAnswer = this.userInput.trim()
 
-      if (validAnswers.includes(this.userInput.toLowerCase().trim())) {
+      if (validAnswers.includes(userAnswer.toLowerCase())) {
         this.correctCount++
         this.nextCharacter()
       } else {
-
         this.errorStore.addError({
           userAnswer,
           correctAnswer: this.mode === 'normal' ?
@@ -282,17 +325,21 @@ export default {
         this.nextCharacter()
       } else {
         this.isError = true
-        setTimeout(() => this.isError = false, 1000)
+        setTimeout(() => this.isError = false, 500)
       }
     },
     nextCharacter() {
       this.showingHint = false
       this.isHintDisabled = false
+      this.hintText = ''
 
       if (this.currentIndex < this.characters.length - 1) {
         this.currentIndex++
         this.userInput = ''
         this.preloadNextImage()
+        this.$nextTick(() => {
+           if(this.$refs.answerInput) this.$refs.answerInput.focus()
+        })
       } else {
         this.endGame()
       }
@@ -324,6 +371,8 @@ export default {
       this.currentIndex = 0
       this.userInput = ''
       this.correctCount = 0
+      this.isHintDisabled = false
+      this.showingHint = false
     },
     showHint() {
       if (this.isHintDisabled) return
@@ -332,14 +381,23 @@ export default {
         ? this.currentCharacter.names
         : this.currentCharacter.seiyuu
 
-      const nameToUse = targetName.zh
+      const nameToUse = targetName.zh || targetName.jp
 
-      const randomChars = nameToUse.split('').sort(() => 0.5 - Math.random()).slice(0, 2).join('')
+      if (!nameToUse) return
+
+      // Logic: reveal 50% of characters or at least 1
+      const chars = nameToUse.split('')
+      const revealCount = Math.max(1, Math.floor(chars.length / 2))
+      const indicesToReveal = new Set()
+      
+      while(indicesToReveal.size < revealCount) {
+        indicesToReveal.add(Math.floor(Math.random() * chars.length))
+      }
 
       let hintText = ''
-      for (let i = 0; i < nameToUse.length; i++) {
-        if (randomChars.includes(nameToUse[i])) {
-          hintText += nameToUse[i]
+      for (let i = 0; i < chars.length; i++) {
+        if (indicesToReveal.has(i)) {
+          hintText += chars[i]
         } else {
           hintText += ' _ '
         }
@@ -348,6 +406,10 @@ export default {
       this.hintText = hintText
       this.showingHint = true
       this.isHintDisabled = true
+      // Focus back to input
+      this.$nextTick(() => {
+        if(this.$refs.answerInput) this.$refs.answerInput.focus()
+      })
     },
     skipCharacter() {
       this.errorStore.addError({
@@ -365,486 +427,700 @@ export default {
     },
     preloadNextImage() {
       const startIndex = this.currentIndex + 1
-      const endIndex = Math.min(startIndex + 10, this.characters.length)
+      const endIndex = Math.min(startIndex + 5, this.characters.length)
 
       for (let i = startIndex; i < endIndex; i++) {
         const character = this.characters[i];
         const img = new Image();
         img.src = this.getImageUrl(character.image)
       }
+    },
+    goHome() {
+      this.router.push('/')
     }
   }
 }
 </script>
 
-
 <style scoped>
-:root {
-  --color-text-base: #4d4d4d;
-  --color-text-gray: #141414;
-  --color-gray: #d2d2d2;
-  --color-blue: #2a5dfa;
-  --color-green: #69c832;
-  --color-yellow: #ffba00;
-  --color-orange: #ff9600;
-  --color-error: red
-}
-
-@media (orientation : portrait) {
-  .charaContainer {
-    width: 27.3333333333vh !important;
-    height: 44vh !important;
-  }
-
-  .charaDl {
-    height: 42.9333333333vh !important;
-    width: 26.2666666667vh !important;
-  }
-
-  .dt-img {
-    height: 34.4vh !important;
-  }
-
-  .font-weight-bold {
-    font-size: 2.8vh !important;
-    margin-top: 1.0666666667vh !important;
-  }
-
-  .font-weight-bold {
-    font-size: 2.8vh !important;
-    margin-top: 1.0666666667vh !important;
-  }
-
-  .charaDd {
-    padding-left: 2vh !important;
-  }
-
-  .name {
-    font-size: 2.3vh !important;
-  }
-
-  .cv {
-    font-size: 2.4vh !important;
-    margin-top: .9333333333vh !important;
-  }
-
-  .charaP {
-    font-size: 1.8vh !important;
-  }
-
-  a dl dt .dt-bg:before {
-    height: 30vh !important;
-    width: 21.7333333333vh !important;
-  }
-
-  a dl dd:before {
-    width: .9333333333vh !important;
-  }
-
-  .rusult-screen {
-    width: 90vw !important;
-  }
-}
-
-/* 纯抄袭官网，实在懒得细改了 */
-.charaContainer {
-  -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: transparent;
-  --vh: 8.34px;
-  font-family: YakuHanJP, Roboto, Zen Kaku Gothic New, sans-serif;
-  font-weight: 500;
-  line-height: 1;
-  color: var(--color-text-gray);
-  list-style: none;
-  border-style: solid;
-  border-width: 0;
-  box-sizing: border-box;
-  transition: transform .7s cubic-bezier(.19, 1, .22, 1), opacity .7s cubic-bezier(.165, .84, .44, 1);
-  height: 44vw;
-  margin: auto;
-  width: 27.3333333333vw;
-  opacity: 1;
-  transform: translateY(0) translateZ(0);
-  transition-delay: 0s;
-}
-
-.charaALink {
-  -webkit-text-size-adjust: 100%;
-  --vh: 8.34px;
-  font-family: YakuHanJP, Roboto, Zen Kaku Gothic New, sans-serif;
-  font-weight: 500;
-  line-height: 1;
-  list-style: none;
-  border-style: solid;
-  border-width: 0;
-  box-sizing: border-box;
-  color: inherit;
-  text-decoration: none;
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
-  --color-btn: var(--color-main);
-  background-color: var(--color-sub);
-  filter: drop-shadow(var(--xpos) var(--ypos) var(--blur) rgba(0, 0, 0, .2));
-  height: 100%;
+.game-container {
   width: 100%;
-  --xpos: 0;
-  --ypos: .4vw;
-  --blur: .6666666667vw;
-  display: block;
-  overflow: hidden;
-  position: relative;
-  z-index: 1;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-.charaInner,
-.charaDl,
-.charaDt,
-.dt-img,
-.img-loaded,
-.dt-bg,
-.font-weight-bold,
-.charaDd,
-.name,
-.cv,
-.charaP,
-.charaSpan {
-  -webkit-text-size-adjust: 100%;
-  --vh: 8.34px;
-  border-style: solid;
-  border-width: 0;
-  box-sizing: border-box;
-}
-
-.charaInner,
-.charaDl,
-.charaDt,
-.dt-img,
-.img-loaded,
-.dt-bg {
-  font-family: YakuHanJP, Roboto, Zen Kaku Gothic New, sans-serif;
-  line-height: 1;
-  list-style: none;
-  color: inherit;
-  -webkit-tap-highlight-color: transparent;
-  --color-btn: var(--color-main);
-  --xpos: 0;
-  --ypos: .4vw;
-  --blur: .6666666667vw;
-}
-
-.charaInner {
-  font-weight: 500;
-  height: 100%;
-}
-
-.charaDl {
-  margin: 0;
-  background-color: #fff;
+.screen {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  position: relative;
-  height: 42.9333333333vw;
-  width: 26.2666666667vw;
-  transform: translateZ(0);
-  transition: transform .3s cubic-bezier(.165, .84, .44, 1);
-}
-
-.charaDt {
-  font-weight: inherit;
-}
-
-.dt-img {
-  object-fit: cover;
-  overflow: hidden;
-  position: relative;
-  z-index: 2;
-  height: 34.4vw;
-}
-
-.img-loaded {
-  display: block;
-}
-
-.dt-bg {
-  display: flex;
-  left: 0;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: 1;
-}
-
-.font-weight-bold {
-  margin: 0;
-  font-weight: 700;
-  font-family: midasi-w, Raleway, sans-serif;
-  letter-spacing: .05em;
   align-items: center;
-  color: var(--color-main);
-  display: flex;
-  flex: auto;
-  writing-mode: vertical-rl;
-  font-size: 2.8vw;
-  margin-top: 1.0666666667vw;
 }
 
-.charaDd {
-  font-family: YakuHanJP, Roboto, Zen Kaku Gothic New, sans-serif;
-  font-weight: 500;
-  margin-left: 0;
-  border-top: 1px solid var(--color-main);
+/* Start Screen */
+.start-card {
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  padding: 40px 30px;
+}
+
+.game-title {
+  margin-bottom: 30px;
+  font-size: 1.8rem;
+  color: var(--text-main);
+}
+
+.settings {
+  margin-bottom: 30px;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  justify-content: center;
-  position: relative;
-  z-index: 10;
-  padding-left: 2vw;
-  align-items: start;
-}
-
-.name {
-  margin: 0;
-  font-weight: 700;
-  letter-spacing: -.05em;
-  font-size: 2.3vw;
-}
-
-.cv {
-  color: #505050;
-  height: 1em;
-  font-size: 2.4vw;
-  margin-top: .9333333333vw;
-  display: inline-block;
-}
-
-.charaP {
-  color: #505050;
-  font-size: 1.8vw;
-  margin: 0;
-}
-
-.charaSpan {
-  font-family: midasi-w, Raleway, sans-serif;
-  letter-spacing: .05em;
-  margin-left: .1em;
-  margin-right: .1em;
-  display: inline-block;
-}
-
-a dl dt .dt-bg:before {
-  background-color: var(--color-main);
-  content: "";
-  display: block;
-}
-
-a dl dt .dt-bg:before {
-  height: 30vw;
-  width: 21.7333333333vw;
-}
-
-a dl dd:before {
-  width: .9333333333vw;
-}
-
-a dl dd:before {
-  background-color: var(--color-main);
-  content: "";
-  display: block;
-  height: 100%;
-  left: 0;
-  position: absolute;
-  top: 0;
-}
-
-*,
-:after,
-:before {
-  border-style: solid;
-  border-width: 0;
-  box-sizing: border-box;
-}
-
-a dl:after {
-  border: 1px solid var(--color-main);
-  content: "";
-  display: block;
-  height: 100%;
-  left: 0;
-  pointer-events: none;
-  position: absolute;
-  top: 0;
+  gap: 25px;
   width: 100%;
-  z-index: 10;
 }
 
-.progress-container {
-  margin: 20px auto;
-  max-width: 600px;
-  padding: 0 15px;
+.setting-group {
+  text-align: left;
+  padding: 0 10px;
 }
 
-.progress-bar {
-  height: 12px;
-  background-color: #f0f0f0;
-  border-radius: 6px;
-  overflow: hidden;
+.setting-title {
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--text-main);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.setting-title::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 16px;
+  background: var(--primary-color);
+  margin-right: 8px;
+  border-radius: 2px;
+}
+
+.segmented-control {
   position: relative;
+  display: flex;
+  background: #f0f2f5;
+  border-radius: 12px;
+  padding: 4px;
+  user-select: none;
+  width: 100%;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.segmented-control input[type="radio"] {
+  display: none;
+}
+
+.segment-label {
+  flex: 1;
+  text-align: center;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-sub);
+  cursor: pointer;
+  z-index: 2;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+
+.segment-indicator {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  z-index: 1;
+}
+
+.segmented-control input:nth-of-type(1):checked ~ .segment-indicator {
+  transform: translateX(0);
+}
+
+.segmented-control input:nth-of-type(2):checked ~ .segment-indicator {
+  transform: translateX(100%);
+}
+
+.segmented-control input:nth-of-type(1):checked ~ .segment-label:nth-of-type(1),
+.segmented-control input:nth-of-type(2):checked ~ .segment-label:nth-of-type(2) {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.start-btn {
+  width: 100%;
+  font-size: 1.2rem;
+  padding: 1rem;
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* Game Screen */
+.game-header {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.progress-wrapper {
+  background: white;
+  padding: 15px 20px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: var(--text-sub);
+}
+
+.progress-track {
+  height: 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  border-radius: 6px;
   transition: width 0.3s ease, background-color 0.3s ease;
 }
 
-.progress-text {
-  text-align: center;
-  margin-bottom: 8px;
-  font-size: 1.1em;
-  color: var(--color-text-gray);
-  font-weight: bold;
+.character-card-wrapper {
+  width: 100%;
+  perspective: 1000px;
 }
 
-@media (max-width: 768px) {
-  .progress-container {
-    margin: 15px 10px;
-  }
-
-  .progress-bar {
-    height: 10px;
-  }
-
-  .progress-text {
-    font-size: 0.9em;
-  }
+.character-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0,0,0,0.05);
 }
 
-.hint-button {
-  position: fixed;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: #f8fafc;
-  color: #505050;
-  font-size: 2rem;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+.card-image-container {
+  position: relative;
+  background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
+  padding: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
-  cursor: pointer;
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.15),
-    0 2px 4px -2px rgba(0, 0, 0, 0.08);
-  z-index: 10;
+  min-height: 300px;
 }
 
-.hint-popup.show {
-  opacity: 1;
+.image-wrapper {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 5px solid white;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  z-index: 1;
 }
 
-.hint-popup {
-  position: fixed;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: 300px;
-  margin: auto;
-  margin-bottom: 5px;
-  gap: 20px;
-  padding: 20px;
-  background: #f8fafc;
-  border-radius: 16px;
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.15),
-    0 2px 4px -2px rgba(0, 0, 0, 0.08);
-  opacity: 0;
-  transition: opacity 0.5s ease;
-  z-index: 100;
+.character-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.button-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.character-badge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: var(--theme-color);
+  box-shadow: var(--shadow-sm);
 }
 
-.skip-button {
-  margin-right: 10px;
-  background-color: white;
-  color: #8c83ff;
+.card-content {
+  padding: 30px 20px;
+  text-align: center;
 }
 
-.submit-button {
-  background-color: #8c83ff;
-  color: white;
-}
-
-.error-list {
-  margin-top: 2rem;
-  max-width: 600px;
+.input-section {
+  margin-bottom: 30px;
+  max-width: 400px;
   margin-left: auto;
   margin-right: auto;
 }
 
-.error-item {
-  background: #fff;
-  border-radius: 12px;
-  margin: 1rem 0;
-  padding: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-left: 4px solid #ff4444;
-}
-
-.error-card {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.error-image img {
-  border-radius: 8px;
-  border: 2px solid #eee;
-}
-
-.error-info p {
-  margin: 0.5rem 0;
-  font-size: 0.95rem;
-}
-
-.wrong-answer {
-  color: #ff4444;
-  text-decoration: line-through;
-}
-
-.correct-answer {
-  color: #00c851;
+.seiyuu-label {
+  display: block;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
   font-weight: bold;
 }
 
-.wrong-answer[data-skipped]::before {
+.cv-tag {
+  background: #333;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  margin-left: 5px;
+}
+
+.input-group {
+  position: relative;
+}
+
+.game-input {
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid #ddd;
+  padding: 10px 0;
+  font-size: 1.5rem;
+  text-align: center;
+  outline: none;
+  background: transparent;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.input-border {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.game-input:focus ~ .input-border {
+  width: 100%;
+}
+
+.game-input:focus {
+  border-bottom-color: transparent;
+}
+
+.input-group.error .game-input {
+  color: var(--accent-color);
+  border-bottom-color: var(--accent-color);
+}
+
+.actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+  min-width: 120px;
+}
+
+.btn-secondary {
+  background-color: #e4e7eb;
+  color: var(--text-main);
+  min-width: 100px;
+}
+
+.btn-secondary:hover {
+  background-color: #d3d7dd;
+}
+
+.hint-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.hint-btn {
+  background: none;
+  border: none;
   color: #999;
+  cursor: pointer;
+  transition: color 0.3s;
+  padding: 5px;
 }
 
-.error-item.skipped {
-  background-color: #f8f9fa;
-  border-left: 4px solid #6c757d;
+.hint-btn:hover:not(:disabled) {
+  color: var(--primary-color);
 }
 
-.error-item.skipped .wrong-answer {
-  color: #6c757d;
+.hint-text {
+  font-size: 1.2rem;
+  letter-spacing: 5px;
+  color: var(--text-sub);
+  font-weight: bold;
+  animation: fadeIn 0.5s;
 }
 
-@media (max-width: 768px) {
-  .error-card {
-    flex-direction: column;
-    align-items: flex-start;
+/* Result Screen */
+.result-card {
+  width: 100%;
+  text-align: center;
+  padding: 40px;
+}
+
+.result-title {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: var(--primary-color);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.score-section {
+  background: white;
+  color: var(--text-main);
+  padding: 30px;
+  border-radius: 20px;
+  margin-bottom: 30px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid #eee;
+}
+
+.score-label {
+  font-size: 1rem;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.score-value {
+  font-size: 4rem;
+  font-weight: 900;
+  line-height: 1.2;
+  color: var(--primary-color);
+}
+
+.score-rank {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%) rotate(-10deg);
+  font-size: 6rem;
+  font-weight: 900;
+  color: rgba(0,0,0,0.05);
+  pointer-events: none;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 12px;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--text-main);
+}
+
+.result-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.error-list {
+  text-align: left;
+  margin-top: 40px;
+  border-top: 1px solid #eee;
+  padding-top: 30px;
+}
+
+.error-list h4 {
+  margin-bottom: 20px;
+  text-align: center;
+  color: var(--text-sub);
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.error-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.error-card-item {
+  display: flex;
+  gap: 15px;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s;
+}
+
+.error-card-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.error-img-wrapper {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid var(--primary-color);
+}
+
+.error-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.error-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.error-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: var(--text-main);
+}
+
+.error-answer {
+  font-size: 0.9rem;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.error-answer.wrong {
+  color: #e74c3c;
+}
+
+.error-answer.correct {
+  color: #27ae60;
+  font-weight: 500;
+}
+
+.error-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.error-details p {
+  font-size: 0.9rem;
+  margin-bottom: 3px;
+}
+
+.error-name {
+  font-weight: bold;
+}
+
+.error-answer.wrong {
+  color: var(--accent-color);
+}
+
+.error-answer.correct {
+  color: var(--primary-color);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* New Character Display Card Styles */
+.character-display-card {
+  width: 100%;
+  display: flex;
+  flex-direction: row; /* Changed to row for side-by-side layout */
+  background: white;
+  border-bottom: 1px solid #eee;
+  position: relative;
+}
+
+.card-content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Prevent flex item from overflowing */
+}
+
+.card-main-visual {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-height: 400px;
+  display: flex;
+  overflow: hidden;
+  flex: 1; /* Allow it to grow */
+}
+
+.character-img-display {
+  flex: 1;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  transform: scale(1.1);
+  transform-origin: center 30%;
+}
+
+.visual-side-strip-container {
+  display: flex;
+  height: auto; /* Full height */
+  flex-shrink: 0;
+}
+
+.visual-side-strip {
+  width: 45px;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Align to top */
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+  padding-top: 20px; /* Add padding for visual breathing room */
+}
+
+.vertical-text {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-weight: 800;
+  font-size: 1.2rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-family: 'Arial Black', sans-serif;
+  /* color set inline */
+  padding: -5px 0;
+}
+
+.visual-accent-strip {
+  width: 12px;
+  /* background-color set inline */
+  flex-shrink: 0;
+  height: 100%;
+}
+
+.card-info-box {
+  background: white;
+  padding: 12px 20px;
+  border-bottom-width: 6px;
+  border-bottom-style: solid;
+  /* border-color set inline */
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.info-name-row {
+  display: flex;
+  align-items: center;
+}
+
+.info-name {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #333;
+}
+
+.info-cv-row {
+  display: flex;
+  align-items: center;
+}
+
+.info-cv {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Adjust existing styles */
+.character-card {
+  /* Ensure column layout */
+  display: flex;
+  flex-direction: column;
+}
+
+.card-content {
+  padding: 20px; /* Reduce padding as info is now above */
+}
+
+/* Responsive adjustments */
+@media (min-width: 600px) {
+  .card-main-visual {
+    height: 350px;
+  }
+}
+
+@media (min-width: 768px) {
+  .character-card {
+    flex-direction: row;
+    align-items: stretch;
   }
 
-  .error-image img {
-    width: 50px;
+  .character-display-card {
+    width: 50%;
+    border-bottom: none;
+    border-right: 1px solid #eee;
+  }
+  
+  .card-main-visual {
+    flex: 1;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+  }
+
+  .card-content {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px;
   }
 }
 </style>

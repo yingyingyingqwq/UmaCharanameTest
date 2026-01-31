@@ -2684,10 +2684,10 @@
             "en": "Sakura Chitose O"
         },
         "seiyuu": {
-            "jp": "",
-            "zh": "",
+            "jp": "明智璃子",
+            "zh": "明智璃子",
             "aliases": [],
-            "en": ""
+            "en": "Akechi Riko"
         },
         "mainColor": "#FA83CB",
         "subColor": "#D8C8D1"
@@ -2713,5 +2713,205 @@
         },
         "mainColor": "#009CBD",
         "subColor": "#0CB85F"
+    },
+    {
+        "id": 124,
+        "image": "admiregroove.webp",
+        "names": {
+            "jp": "アドマイヤグルーヴ",
+            "zh": "爱慕律动",
+            "aliases": [
+                "爱慕槽"
+            ],
+            "en": "Admire Groove"
+        },
+        "seiyuu": {
+            "jp": "鈴木日菜",
+            "zh": "铃木日菜",
+            "aliases": [],
+            "en": "Suzuki Hina"
+        },
+        "mainColor": "#344d99",
+        "subColor": "#5cbac8"
+    },
+    {
+        "id": 124,
+        "image": "fenomeno.webp",
+        "names": {
+            "jp": "フェノーメノ",
+            "zh": "超常骏逸",
+            "aliases": [],
+            "en": "Fenomeno"
+        },
+        "seiyuu": {
+            "jp": "日比優理香",
+            "zh": "日比优理香",
+            "aliases": [],
+            "en": "Hibi Yuriko"
+        },
+        "mainColor": "#574a74",
+        "subColor": "#f4db4e"
+    },
+    {
+        "id": 125,
+        "image": "almondeye.webp",
+        "names": {
+            "jp": "アーモンドアイ",
+            "zh": "杏目",
+            "aliases": [],
+            "en": "Almond Eye"
+        },
+        "seiyuu": {
+            "jp": "石原夏織",
+            "zh": "石原夏织",
+            "aliases": [],
+            "en": "Ishihara Kaori"
+        },
+        "mainColor": "#69a9e9",
+        "subColor": "#cc3300"
+    },
+    {
+        "id": 126,
+        "image": "luckylilac.webp",
+        "names": {
+            "jp": "ラッキーライラック",
+            "zh": "旺紫丁",
+            "aliases": [],
+            "en": "Lucky Lilac"
+        },
+        "seiyuu": {
+            "jp": "中島由貴",
+            "zh": "中岛由贵",
+            "aliases": [],
+            "en": "Nakashima Yuki"
+        },
+        "mainColor": "#454152",
+        "subColor": "#907594"
+    },
+    {
+        "id": 127,
+        "image": "granalegria.webp",
+        "names": {
+            "jp": "グランアレグリア",
+            "zh": "放声欢呼",
+            "aliases": [],
+            "en": "Gran Alegria"
+        },
+        "seiyuu": {
+            "jp": "夏目妃菜",
+            "zh": "夏目妃菜",
+            "aliases": [],
+            "en": "Natsume Hina"
+        },
+        "mainColor": "#53565a",
+        "subColor": "#ef4d60"
+    },
+    {
+        "id": 128,
+        "image": "lovesonlyyou.webp",
+        "names": {
+            "jp": "ラヴズオンリーユー",
+            "zh": "唯独爱你",
+            "aliases": [],
+            "en": "Loves Only You"
+        },
+        "seiyuu": {
+            "jp": "久保田未夢",
+            "zh": "久保田未梦",
+            "aliases": [],
+            "en": "Kubota Miyu"
+        },
+        "mainColor": "#424840",
+        "subColor": "#268745"
+    },
+    {
+        "id": 129,
+        "image": "chronogenesis.webp",
+        "names": {
+            "jp": "クロノジェネシス",
+            "zh": "创世驹",
+            "aliases": [],
+            "en": "Chrono Genesis"
+        },
+        "seiyuu": {
+            "jp": "真名瀬日和",
+            "zh": "真名濑日和",
+            "aliases": [],
+            "en": "Makoto Nase Hiyori"
+        },
+        "mainColor": "#464647",
+        "subColor": "#50a19f"
+    },
+    {
+        "id": 130,
+        "image": "currenbouquetdor.webp",
+        "names": {
+            "jp": "カレンブーケドール",
+            "zh": "机伶金花",
+            "aliases": [],
+            "en": "Curren Bouquetd'or"
+        },
+        "seiyuu": {
+            "jp": "小田杏樹",
+            "zh": "小田杏树",
+            "aliases": [],
+            "en": "Koda Anju"
+        },
+        "mainColor": "#8e8180",
+        "subColor": "#473d3c"
+    },
+    {
+        "id": 131,
+        "image": "staygold.webp",
+        "names": {
+            "jp": "ステイゴールド",
+            "zh": "黄金旅程",
+            "aliases": [],
+            "en": "Stay Gold"
+        },
+        "seiyuu": {
+            "jp": "松田颯水",
+            "zh": "松田飒水",
+            "aliases": [],
+            "en": "Matsuda Satsumi"
+        },
+        "mainColor": "#bfb33e",
+        "subColor": "#49699c"
+    },
+    {
+        "id": 132,
+        "image": "reddesire.webp",
+        "names": {
+            "jp": "レッドデザイア",
+            "zh": "红色欲望",
+            "aliases": [],
+            "en": "Red Desire"
+        },
+        "seiyuu": {
+            "jp": "関根瞳",
+            "zh": "关根瞳",
+            "aliases": [],
+            "en": "Sekine Hitomi"
+        },
+        "mainColor": "#cb3a43",
+        "subColor": "#802f2d"
+    },
+    {
+        "id": 133,
+        "image": "kiseki.webp",
+        "names": {
+            "jp": "キセキ",
+            "zh": "神业",
+            "aliases": [],
+            "en": "Kiseki"
+        },
+        "seiyuu": {
+            "jp": "星希成奏",
+            "zh": "星希成奏",
+            "aliases": [],
+            "en": "Hoshiki Seena"
+        },
+        "mainColor": "#2c9c46",
+        "subColor": "#c8dbe9"
     }
 ]
