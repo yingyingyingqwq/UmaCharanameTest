@@ -384,9 +384,7 @@ export default {
     showHint() {
       if (this.isHintDisabled) return
 
-      const targetName = this.mode === 'normal'
-        ? this.currentCharacter.names
-        : this.currentCharacter.seiyuu
+      const targetName = this.currentCharacter.seiyuu
 
       const nameToUse = targetName.zh || targetName.jp
 

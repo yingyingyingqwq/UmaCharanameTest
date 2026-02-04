@@ -90,16 +90,35 @@
               <div class="input-section">
                 <div class="input-group" :class="{ 'error': isError }">
                   
-                  <input 
-                    type="text" 
-                    v-model="userInput" 
-                    @keyup.enter="checkAnswer"
-                    class="game-input"
-                    placeholder="输入角色名 (中/日/英)"
-                    autofocus
-                    ref="answerInput"
-                  >
-                  <div class="input-border" :style="{ backgroundColor: subColor || 'var(--primary-color)' }"></div>
+                  <div class="input-wrapper">
+                    <input 
+                      type="text" 
+                      v-model="userInput" 
+                      @input="onInput"
+                      @keydown.up.prevent="moveSelection(-1)"
+                      @keydown.down.prevent="moveSelection(1)"
+                      @keydown.enter.prevent="handleEnter"
+                      @keydown.esc="closeDropdown"
+                      @blur="closeDropdownDelayed"
+                      class="game-input"
+                      placeholder="输入角色名 (中/日/英)"
+                      autofocus
+                      ref="answerInput"
+                    >
+                    <div class="input-border" :style="{ backgroundColor: subColor || 'var(--primary-color)' }"></div>
+                    
+                    <ul v-if="showDropdown && filteredCandidates.length > 0" class="custom-dropdown">
+                      <li 
+                        v-for="(candidate, index) in filteredCandidates" 
+                        :key="index"
+                        :class="{ 'selected': index === selectedIndex }"
+                        @click="selectCandidate(candidate)"
+                        @mouseenter="selectedIndex = index"
+                      >
+                        {{ candidate }}
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
 
@@ -223,7 +242,11 @@ export default {
       imageCache: new Map(), // 用于存储预加载的图片对象
       mistakeCount: 0,
       currentScore: 0,
-      totalMaxScore: 0
+      totalMaxScore: 0,
+      allCharacters: [],
+      showDropdown: false,
+      selectedIndex: -1,
+      filteredCandidates: []
     }
   },
   computed: {
@@ -265,6 +288,9 @@ export default {
       const nuxtApp = useNuxtApp()
       this.characters = await nuxtApp.$dataLoader.loadCharacters()
       if (this.characters.length === 0) return
+
+      // Store all characters for the dropdown before any slicing
+      this.allCharacters = [...this.characters]
 
       this.shuffleCharacters()
 
@@ -536,12 +562,117 @@ export default {
     },
     goHome() {
       this.router.push('/')
+    },
+    onInput() {
+      if (!this.userInput) {
+        this.showDropdown = false
+        this.filteredCandidates = []
+        return
+      }
+
+      const input = this.userInput.toLowerCase()
+      // Filter characters whose names (zh) include the input
+      const candidates = this.allCharacters
+        .filter(char => char.names.zh && char.names.zh.toLowerCase().includes(input))
+        .map(char => char.names.zh)
+        // Deduplicate
+        .filter((value, index, self) => self.indexOf(value) === index)
+        // Limit to 5 suggestions
+        .slice(0, 5)
+
+      this.filteredCandidates = candidates
+      this.showDropdown = candidates.length > 0
+      this.selectedIndex = -1
+    },
+    moveSelection(direction) {
+      if (!this.showDropdown || this.filteredCandidates.length === 0) return
+      
+      this.selectedIndex += direction
+      
+      // Wrap around
+      if (this.selectedIndex < 0) {
+        this.selectedIndex = this.filteredCandidates.length - 1
+      } else if (this.selectedIndex >= this.filteredCandidates.length) {
+        this.selectedIndex = 0
+      }
+    },
+    handleEnter() {
+      if (this.showDropdown && this.selectedIndex > -1) {
+        this.selectCandidate(this.filteredCandidates[this.selectedIndex])
+      } else {
+        this.checkAnswer()
+        this.closeDropdown()
+      }
+    },
+    selectCandidate(candidate) {
+      this.userInput = candidate
+      this.closeDropdown()
+      this.$nextTick(() => {
+        if(this.$refs.answerInput) this.$refs.answerInput.focus()
+        // Optionally submit immediately
+        // this.checkAnswer() 
+      })
+    },
+    closeDropdown() {
+      this.showDropdown = false
+      this.selectedIndex = -1
+    },
+    closeDropdownDelayed() {
+      // Delay closing to allow click event to fire
+      setTimeout(() => {
+        this.closeDropdown()
+      }, 200)
     }
   }
 }
 </script>
 
 <style scoped>
+/* Input Wrapper for positioning dropdown */
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Custom Dropdown Styles */
+.custom-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 1000;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.custom-dropdown li {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-align: left;
+  font-size: 1.1rem;
+  color: var(--text-main);
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.custom-dropdown li:last-child {
+  border-bottom: none;
+}
+
+.custom-dropdown li:hover,
+.custom-dropdown li.selected {
+  background-color: #f5f7fa;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
 .game-container {
   width: 100%;
   max-width: 800px;
