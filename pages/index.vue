@@ -3,7 +3,7 @@
     <div class="content-wrapper">
       <div class="hero-section">
         <h1 class="title">马批浓度测试器</h1>
-        <p class="subtitle">检测你马批浓度的时候到了…</p>
+        <p class="subtitle">Umamusume Quiz</p>
       </div>
       <ModeSelect />
     </div>

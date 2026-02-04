@@ -559,11 +559,6 @@ export default {
   transition: all 0.3s ease;
 }
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
 .btn-secondary {
   background-color: #e4e7eb;
   color: var(--text-main);
