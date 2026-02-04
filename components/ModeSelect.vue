@@ -15,6 +15,20 @@
           <p class="description">根据给出的立绘，写下对应马娘的声优名吧！</p>
         </div>
       </nuxt-link>
+      <nuxt-link to="/game?mode=pixel" class="mode-card pixel">
+        <div class="icon">👾</div>
+        <div class="text">
+          <h3>像素猜马娘</h3>
+          <p class="description">根据立绘生成的像素色块，猜出是哪位马娘！</p>
+        </div>
+      </nuxt-link>
+      <nuxt-link to="/game?mode=recite" class="mode-card recite">
+        <div class="icon">📝</div>
+        <div class="text">
+          <h3>默写马娘名</h3>
+          <p class="description">凭记忆默写出所有马娘的名字！</p>
+        </div>
+      </nuxt-link>
     </div>
   </div>
 </template>
@@ -99,18 +113,36 @@ export default {
   background: #8c83ff;
 }
 
+.mode-card.pixel:hover {
+  border-color: #ff9f43;
+}
+
+.mode-card.pixel:hover .icon {
+  background: #ff9f43;
+}
+
+.mode-card.recite:hover {
+  border-color: #2e86de;
+}
+
+.mode-card.recite:hover .icon {
+  background: #2e86de;
+}
+
 @media (min-width: 600px) {
   .buttons {
     flex-direction: row;
     justify-content: center;
+    flex-wrap: wrap;
   }
   
   .mode-card {
-    flex: 1;
-    min-width: 240px;
+    flex: 1 1 calc(50% - 20px);
+    max-width: calc(50% - 20px);
+    min-width: 200px;
     flex-direction: column;
     text-align: center;
-    padding: 40px 20px;
+    padding: 30px 20px;
   }
   
   .mode-card .icon {
@@ -120,5 +152,12 @@ export default {
     height: 80px;
     font-size: 3rem;
   }
+}
+
+@media (min-width: 1024px) {
+    .mode-card {
+        flex: 1;
+        max-width: none;
+    }
 }
 </style>

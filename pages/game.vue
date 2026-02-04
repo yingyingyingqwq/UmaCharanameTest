@@ -20,8 +20,16 @@ export default {
     }
   },
   head() {
+    let title = '角色模式 - 马批浓度测试'
+    if (this.mode === 'seiyuu') {
+      title = '声优模式 - 马批浓度测试'
+    } else if (this.mode === 'pixel') {
+      title = '像素模式 - 马批浓度测试'
+    } else if (this.mode === 'recite') {
+      title = '默写模式 - 马批浓度测试'
+    }
     return {
-      title: this.mode === 'normal' ? '角色模式 - 马批浓度测试' : '声优模式 - 马批浓度测试'
+      title
     }
   }
 }
