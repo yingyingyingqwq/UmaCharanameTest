@@ -986,7 +986,7 @@
             "zh": "超级溪流",
             "aliases": [
                 "超级小海湾",
-                "超级小溪",
+                "超级小溪"
             ],
             "en": "Super Creek"
         },
@@ -2773,10 +2773,8 @@
         "image": "fenomeno.webp",
         "names": {
             "jp": "フェノーメノ",
-            "zh": "超常骏骥",
-            "aliases": [
-                "超常骏逸"
-            ],
+            "zh": "超常骏逸",
+            "aliases": [],
             "en": "Fenomeno"
         },
         "seiyuu": {
