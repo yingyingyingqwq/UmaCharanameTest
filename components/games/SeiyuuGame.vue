@@ -205,8 +205,8 @@ export default {
   props: {
     mode: {
       type: String,
-      default: 'normal'
-    }
+      default: 'seiyuu'
+    },
   },
   data() {
     return {
@@ -308,7 +308,7 @@ export default {
         target.zh,
         target.en,
         ...(target.aliases || []),
-      ].map(str => str ? str.toLowerCase().trim() : '')
+      ].map(str => str ? str.toLowerCase().trim() : '').filter(Boolean)
 
       const userAnswer = this.userInput.trim()
 
