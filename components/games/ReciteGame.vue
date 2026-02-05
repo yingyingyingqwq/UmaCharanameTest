@@ -573,4 +573,20 @@ export default {
 .btn-secondary:hover {
   background-color: #d3d7dd;
 }
+
+@media (max-width: 600px) {
+  .stats-grid {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .score-value {
+    font-size: 3rem;
+  }
+  
+  .result-card {
+    padding: 20px;
+  }
+}
 </style>

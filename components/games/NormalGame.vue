@@ -14,7 +14,7 @@
                 <input type="radio" id="count-30" :value="true" v-model="settings.random30">
                 
                 <label for="count-all" class="segment-label">全部角色</label>
-                <label for="count-30" class="segment-label">随机30个</label>
+                <label for="count-30" class="segment-label">随机15个</label>
                 
                 <div class="segment-indicator"></div>
               </div>
@@ -1129,6 +1129,20 @@ export default {
     flex-direction: column;
     justify-content: center;
     padding: 40px;
+  }
+}
+
+@media (max-width: 600px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .score-value {
+    font-size: 3rem;
+  }
+  
+  .result-card {
+    padding: 20px;
   }
 }
 </style>

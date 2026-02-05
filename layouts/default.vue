@@ -28,6 +28,7 @@
             </svg>
           </button>
         </div>
+        <p class="credits">Made by yingyingyingqwq</p>
       </div>
     </footer>
   </div>
@@ -102,7 +103,7 @@
 
 .app-footer {
   background-color: var(--card-bg);
-  padding: .7rem 0;
+  padding: .5rem 0;
   text-align: center;
   color: var(--text-sub);
   font-size: 0.9rem;
@@ -112,15 +113,21 @@
 
 .container {
   max-width: 1200px;
-  margin: 0 auto;
+  margin: .1rem auto;
   padding: 0 1.5rem;
+}
+
+.credits {
+  margin-top: 0.2rem;
+  font-size: 0.6rem;
+  opacity: 0.5;
 }
 
 .social-links {
   display: flex;
   justify-content: center;
   gap: 15px;
-  margin-bottom: 1.5rem;
+  margin-bottom: .3rem;
 }
 
 .social-btn {

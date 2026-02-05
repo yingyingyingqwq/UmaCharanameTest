@@ -14,7 +14,7 @@
                 <input type="radio" id="count-30" :value="true" v-model="settings.random30">
                 
                 <label for="count-all" class="segment-label">全部角色</label>
-                <label for="count-30" class="segment-label">随机30个</label>
+                <label for="count-30" class="segment-label">随机15个</label>
                 
                 <div class="segment-indicator"></div>
               </div>
@@ -95,6 +95,8 @@
                       type="text" 
                       v-model="userInput" 
                       @input="onInput"
+                      @focus="onInput"
+                      @click="onInput"
                       @keydown.up.prevent="moveSelection(-1)"
                       @keydown.down.prevent="moveSelection(1)"
                       @keydown.enter.prevent="handleEnter"
@@ -295,7 +297,7 @@ export default {
       this.shuffleCharacters()
 
       if (this.settings.random30) {
-        this.characters = this.characters.slice(0, 30)
+        this.characters = this.characters.slice(0, 15)
       }
 
       this.gameStarted = true
@@ -837,7 +839,7 @@ export default {
   background: white;
   border-radius: 20px;
   box-shadow: var(--shadow-md);
-  overflow: hidden;
+  /* overflow: hidden; Removed to allow dropdown overflow */
   transition: all 0.3s ease;
   border: 1px solid rgba(0,0,0,0.05);
 }
@@ -1208,6 +1210,7 @@ export default {
   background: white;
   border-bottom: 1px solid #eee;
   position: relative;
+  border-radius: 20px 20px 0 0;
 }
 
 .card-content-wrapper {
@@ -1344,6 +1347,7 @@ export default {
     width: 50%;
     border-bottom: none;
     border-right: 1px solid #eee;
+    border-radius: 20px 0 0 20px;
   }
   
   .card-main-visual {
@@ -1393,5 +1397,19 @@ export default {
   opacity: 0;
   max-height: 0;
   transform: translateY(-10px);
+}
+
+@media (max-width: 600px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .score-value {
+    font-size: 3rem;
+  }
+  
+  .result-card {
+    padding: 20px;
+  }
 }
 </style>

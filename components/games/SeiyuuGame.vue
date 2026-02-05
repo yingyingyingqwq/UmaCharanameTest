@@ -269,7 +269,7 @@ export default {
       this.shuffleCharacters()
 
       if (this.settings.random30) {
-        this.characters = this.characters.slice(0, 30)
+        this.characters = this.characters.slice(0, 15)
       }
 
       this.gameStarted = true
@@ -1132,6 +1132,20 @@ export default {
     flex-direction: column;
     justify-content: center;
     padding: 40px;
+  }
+}
+
+@media (max-width: 600px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .score-value {
+    font-size: 3rem;
+  }
+  
+  .result-card {
+    padding: 20px;
   }
 }
 </style>
