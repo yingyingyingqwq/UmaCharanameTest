@@ -242,6 +242,10 @@ export default {
       this.router.push('/')
     },
     getImageUrl(imageName) {
+      const config = useRuntimeConfig()
+      if (config.public.imageBaseUrl.startsWith('http')) {
+        return `${config.public.imageBaseUrl}${imageName}`
+      }
       return new URL(`/assets/images/characters/syoubufuku/${imageName}`, import.meta.url).href
     }
   }

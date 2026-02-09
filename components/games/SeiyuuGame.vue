@@ -14,7 +14,7 @@
                 <input type="radio" id="count-30" :value="true" v-model="settings.random30">
                 
                 <label for="count-all" class="segment-label">全部角色</label>
-                <label for="count-30" class="segment-label">随机30个</label>
+                <label for="count-30" class="segment-label">随机15个</label>
                 
                 <div class="segment-indicator"></div>
               </div>
@@ -289,6 +289,10 @@ export default {
       })
     },
     getImageUrl(imageName) {
+      const config = useRuntimeConfig()
+      if (config.public.imageBaseUrl.startsWith('http')) {
+        return `${config.public.imageBaseUrl}${imageName}`
+      }
       return new URL(`/assets/images/characters/syoubufuku/${imageName}`, import.meta.url).href
     },
     shuffleCharacters() {

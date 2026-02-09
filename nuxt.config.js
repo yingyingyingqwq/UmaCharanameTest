@@ -24,5 +24,12 @@ export default {
         }
       ]
     }
+  },
+  runtimeConfig: {
+    public: {
+      imageBaseUrl: process.env.NODE_ENV === 'production'
+        ? 'https://img.admire.vegas/umaquiz/syoubufuku/'
+        : '/assets/images/characters/syoubufuku/'
+    }
   }
 };

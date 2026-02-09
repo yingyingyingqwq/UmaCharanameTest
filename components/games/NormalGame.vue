@@ -264,7 +264,7 @@ export default {
       this.shuffleCharacters()
 
       if (this.settings.random30) {
-        this.characters = this.characters.slice(0, 30)
+        this.characters = this.characters.slice(0, 15)
       }
 
       this.gameStarted = true
@@ -284,6 +284,10 @@ export default {
       })
     },
     getImageUrl(imageName) {
+      const config = useRuntimeConfig()
+      if (config.public.imageBaseUrl.startsWith('http')) {
+        return `${config.public.imageBaseUrl}${imageName}`
+      }
       return new URL(`/assets/images/characters/syoubufuku/${imageName}`, import.meta.url).href
     },
     shuffleCharacters() {
