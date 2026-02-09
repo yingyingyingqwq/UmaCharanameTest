@@ -8,6 +8,7 @@ export default {
   },
   app: {
     head: {
+      title: '马批浓度测试器',
       script: [
         {
           src: `https://www.googletagmanager.com/gtag/js?id=G-F57HL0RLZB`,

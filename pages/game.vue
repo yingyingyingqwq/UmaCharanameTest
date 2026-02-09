@@ -12,27 +12,27 @@
   </div>
 </template>
 
-<script>
-export default {
-  computed: {
-    mode() {
-      return this.$route.query.mode || 'normal'
-    }
-  },
-  head() {
-    let title = '角色模式 - 马批浓度测试'
-    if (this.mode === 'seiyuu') {
-      title = '声优模式 - 马批浓度测试'
-    } else if (this.mode === 'pixel') {
-      title = '像素模式 - 马批浓度测试'
-    } else if (this.mode === 'recite') {
-      title = '默写模式 - 马批浓度测试'
-    }
-    return {
-      title
-    }
+<script setup>
+const route = useRoute()
+
+const mode = computed(() => route.query.mode || 'normal')
+
+const title = computed(() => {
+  switch (mode.value) {
+    case 'seiyuu':
+      return '声优模式 - 马批浓度测试器'
+    case 'pixel':
+      return '像素模式 - 马批浓度测试器'
+    case 'recite':
+      return '默写模式 - 马批浓度测试器'
+    default:
+      return '角色模式 - 马批浓度测试器'
   }
-}
+})
+
+useHead({
+  title
+})
 </script>
 
 <style scoped>
