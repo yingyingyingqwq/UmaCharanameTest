@@ -1,7 +1,7 @@
 <template>
   <div class="game-container">
     <!-- Start Screen -->
-    <transition name="fade" mode="out-in">
+    <transition name="fade" mode="out-in" @after-enter="onScreenReady">
       <div v-if="!gameStarted" class="screen start-screen" key="start">
         <div class="card start-card">
           <h2 class="game-title">像素猜马娘</h2>
@@ -315,11 +315,13 @@ export default {
       
       this.mistakeCount = 0
 
-      // Draw first pixelated image
-      this.$nextTick(() => {
+      // Draw first pixelated image is handled by onScreenReady after transition
+    },
+    onScreenReady() {
+      if (this.gameStarted && this.$refs.pixelCanvas) {
         this.drawPixelatedImage()
         if(this.$refs.answerInput) this.$refs.answerInput.focus()
-      })
+      }
     },
     drawPixelatedImage() {
       const canvas = this.$refs.pixelCanvas
