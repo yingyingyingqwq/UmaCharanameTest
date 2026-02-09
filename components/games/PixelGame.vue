@@ -34,7 +34,15 @@
             </div>
           </div>
 
-          <button @click="startGame" class="btn-primary start-btn">开始挑战</button>
+          <div class="loading-overlay" v-if="isLoading">
+            <div class="loading-content">
+              <div class="loading-spinner"></div>
+              <div class="loading-text">资源加载中... {{ loadingProgress }}%</div>
+            </div>
+          </div>
+          <button @click="startGame" class="btn-primary start-btn" :disabled="isLoading">
+            {{ isLoading ? '准备中...' : '开始挑战' }}
+          </button>
         </div>
       </div>
 
@@ -242,6 +250,8 @@ export default {
       hintText: '',
       isHintDisabled: false,
       imageCache: new Map(), // 用于存储预加载的图片对象
+      isLoading: false,
+      loadingProgress: 0,
       mistakeCount: 0,
       currentScore: 0,
       totalMaxScore: 0,
@@ -287,6 +297,8 @@ export default {
   },
   methods: {
     async startGame() {
+      if (this.isLoading) return
+
       const nuxtApp = useNuxtApp()
       this.characters = await nuxtApp.$dataLoader.loadCharacters()
       if (this.characters.length === 0) return
@@ -300,6 +312,17 @@ export default {
         this.characters = this.characters.slice(0, 15)
       }
 
+      this.isLoading = true
+      this.loadingProgress = 0
+      
+      try {
+        await this.preloadAllImages()
+      } catch (e) {
+        console.error('Image preload failed', e)
+      } finally {
+        this.isLoading = false
+      }
+
       this.gameStarted = true
       this.displayTime = true
       this.errorStore.clearErrors()
@@ -310,12 +333,44 @@ export default {
       this.totalMaxScore = this.characters.length * 3 // Max score per char is 3
       this.userInput = ''
       
-      // 初始预加载
-      this.preloadNextImage()
-      
       this.mistakeCount = 0
 
       // Draw first pixelated image is handled by onScreenReady after transition
+    },
+    async preloadAllImages() {
+      const total = this.characters.length
+      let loaded = 0
+      
+      const promises = this.characters.map(char => {
+        return new Promise((resolve) => {
+          const url = this.getImageUrl(char.image)
+          if (this.imageCache.has(url)) {
+            loaded++
+            this.loadingProgress = Math.floor((loaded / total) * 100)
+            resolve()
+            return
+          }
+          
+          const img = new Image()
+          if (url.startsWith('http')) {
+             img.crossOrigin = 'Anonymous'
+          }
+          img.onload = () => {
+            loaded++
+            this.loadingProgress = Math.floor((loaded / total) * 100)
+            resolve()
+          }
+          img.onerror = () => {
+            loaded++
+            this.loadingProgress = Math.floor((loaded / total) * 100)
+            resolve()
+          }
+          img.src = url
+          this.imageCache.set(url, img)
+        })
+      })
+      
+      await Promise.all(promises)
     },
     onScreenReady() {
       if (this.gameStarted && this.$refs.pixelCanvas) {
@@ -351,6 +406,9 @@ export default {
       
       if (!img) {
           img = new Image()
+          if (imgUrl.startsWith('http')) {
+            img.crossOrigin = 'Anonymous'
+          }
           img.src = imgUrl
       }
 
@@ -461,7 +519,7 @@ export default {
       if (this.currentIndex < this.characters.length - 1) {
         this.currentIndex++
         this.userInput = ''
-        this.preloadNextImage()
+        // No need to preloadNextImage here as we preloaded all at start
         this.$nextTick(() => {
            this.drawPixelatedImage()
            if(this.$refs.answerInput) this.$refs.answerInput.focus()
@@ -548,25 +606,6 @@ export default {
       })
 
       this.nextCharacter()
-    },
-    preloadNextImage() {
-      const startIndex = this.currentIndex
-      // 预加载接下来10张图片，避免频繁加载
-      const endIndex = Math.min(startIndex + 10, this.characters.length)
-
-      for (let i = startIndex; i < endIndex; i++) {
-        const character = this.characters[i];
-        if (!character) continue
-        
-        const url = this.getImageUrl(character.image)
-        
-        // 使用缓存池防止重复加载和对象被回收
-        if (!this.imageCache.has(url)) {
-          const img = new Image();
-          img.src = url;
-          this.imageCache.set(url, img);
-        }
-      }
     },
     goHome() {
       this.router.push('/')
