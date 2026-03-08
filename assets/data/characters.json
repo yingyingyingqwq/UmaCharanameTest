@@ -2952,5 +2952,149 @@
         },
         "mainColor": "#2c9c46",
         "subColor": "#c8dbe9"
+    },
+    {
+        "id": 135,
+        "image": "kiseki.webp",
+        "names": {
+            "jp": "キセキ",
+            "zh": "神业",
+            "aliases": [],
+            "en": "Kiseki"
+        },
+        "seiyuu": {
+            "jp": "星希成奏",
+            "zh": "星希成奏",
+            "aliases": [],
+            "en": "Hoshiki Seena"
+        },
+        "mainColor": "#2c9c46",
+        "subColor": "#c8dbe9"
+    },
+    {
+        "id": 136,
+        "image": "foreveryoung.webp",
+        "names": {
+            "jp": "フォーエバーヤング",
+            "zh": "永远年轻",
+            "aliases": [],
+            "en": "Forever Young"
+        },
+        "seiyuu": {
+            "jp": "海弓シュリ",
+            "zh": "海弓首里",
+            "aliases": [],
+            "en": "Miyumi Shuri"
+        },
+        "mainColor": "#822b4a",
+        "subColor": "#d8ced2"
+    },
+    {
+        "id": 137,
+        "image": "marchelorraine.webp",
+        "names": {
+            "jp": "マルシュロレーヌ",
+            "zh": "洛林军歌",
+            "aliases": [],
+            "en": "Marche Lorraine"
+        },
+        "seiyuu": {
+            "jp": "近貞月乃",
+            "zh": "近贞月乃",
+            "aliases": [],
+            "en": "Chikasada Tsukino"
+        },
+        "mainColor": "#8b1538",
+        "subColor": "#e9a2b2"
+    },
+    {
+        "id": 138,
+        "image": "epiphaneia.webp",
+        "names": {
+            "jp": "エピファネイア",
+            "zh": "神威启示",
+            "aliases": [],
+            "en": "Epiphaneia"
+        },
+        "seiyuu": {
+            "jp": "千賀光莉",
+            "zh": "千贺光莉",
+            "aliases": [],
+            "en": "Senga Hikari"
+        },
+        "mainColor": "#17af87",
+        "subColor": "#d0dee8"
+    },
+    {
+        "id": 139,
+        "image": "logotype.webp",
+        "names": {
+            "jp": "ロゴタイプ",
+            "zh": "标志名驹",
+            "aliases": [],
+            "en": "Logotype"
+        },
+        "seiyuu": {
+            "jp": "髙橋美空",
+            "zh": "高桥美空",
+            "aliases": [],
+            "en": "Hakahashi Misora"
+        },
+        "mainColor": "#7e2d40",
+        "subColor": "#bd9b60"
+    },
+    {
+        "id": 140,
+        "image": "victoirepisa.webp",
+        "names": {
+            "jp": "ヴィクトワールピサ",
+            "zh": "比萨胜驹",
+            "aliases": [],
+            "en": "Victoire Pisa"
+        },
+        "seiyuu": {
+            "jp": "嶋野花",
+            "zh": "嶋野花",
+            "aliases": [],
+            "en": "Shimano Hana"
+        },
+        "mainColor": "#4146b8",
+        "subColor": "#f1eb9d"
+    },
+    {
+        "id": 141,
+        "image": "rosekingdom.webp",
+        "names": {
+            "jp": "ローズキングダム",
+            "zh": "玫瑰帝国",
+            "aliases": [],
+            "en": "Rose Kingdom"
+        },
+        "seiyuu": {
+            "jp": "菊池ゆりな",
+            "zh": "菊池ゆりな",
+            "aliases": [],
+            "en": "Kikuchi Yurina"
+        },
+        "mainColor": "#cb363d",
+        "subColor": "#52606b"
+    },
+    {
+        "id": 142,
+        "image": "rulership.webp",
+        "names": {
+            "jp": "ルーラーシップ",
+            "zh": "统治地位",
+            "aliases": [],
+            "en": "Rulership"
+        },
+        "seiyuu": {
+            "jp": "海野水玉",
+            "zh": "海野水玉",
+            "aliases": [],
+            "en": "Umino Mizutama"
+        },
+        "mainColor": "#beab08",
+        "subColor": "#3a4c5c"
     }
 ]
