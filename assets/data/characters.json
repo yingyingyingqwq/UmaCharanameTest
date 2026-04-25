@@ -2955,24 +2955,6 @@
     },
     {
         "id": 135,
-        "image": "kiseki.webp",
-        "names": {
-            "jp": "キセキ",
-            "zh": "神业",
-            "aliases": [],
-            "en": "Kiseki"
-        },
-        "seiyuu": {
-            "jp": "星希成奏",
-            "zh": "星希成奏",
-            "aliases": [],
-            "en": "Hoshiki Seena"
-        },
-        "mainColor": "#2c9c46",
-        "subColor": "#c8dbe9"
-    },
-    {
-        "id": 136,
         "image": "foreveryoung.webp",
         "names": {
             "jp": "フォーエバーヤング",
@@ -2990,7 +2972,7 @@
         "subColor": "#d8ced2"
     },
     {
-        "id": 137,
+        "id": 136,
         "image": "marchelorraine.webp",
         "names": {
             "jp": "マルシュロレーヌ",
@@ -3008,7 +2990,7 @@
         "subColor": "#e9a2b2"
     },
     {
-        "id": 138,
+        "id": 137,
         "image": "epiphaneia.webp",
         "names": {
             "jp": "エピファネイア",
@@ -3026,7 +3008,7 @@
         "subColor": "#d0dee8"
     },
     {
-        "id": 139,
+        "id": 138,
         "image": "logotype.webp",
         "names": {
             "jp": "ロゴタイプ",
@@ -3044,7 +3026,7 @@
         "subColor": "#bd9b60"
     },
     {
-        "id": 140,
+        "id": 139,
         "image": "victoirepisa.webp",
         "names": {
             "jp": "ヴィクトワールピサ",
@@ -3062,7 +3044,7 @@
         "subColor": "#f1eb9d"
     },
     {
-        "id": 141,
+        "id": 140,
         "image": "rosekingdom.webp",
         "names": {
             "jp": "ローズキングダム",
@@ -3080,7 +3062,7 @@
         "subColor": "#52606b"
     },
     {
-        "id": 142,
+        "id": 141,
         "image": "rulership.webp",
         "names": {
             "jp": "ルーラーシップ",
