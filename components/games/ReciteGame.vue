@@ -13,7 +13,10 @@
 
       <!-- Game Screen -->
       <div v-else-if="!isGameFinished" class="screen game-screen" key="game">
-        <div class="game-header sticky-header">
+        <transition name="toast">
+          <div v-if="duplicateMessage" class="duplicate-toast">{{ duplicateMessage }}</div>
+        </transition>
+        <div class="game-header sticky-header" ref="stickyHeader">
           <div class="header-content">
             <div class="header-card info-card">
               <div class="progress-info">
@@ -43,11 +46,12 @@
           </div>
         </div>
 
-        <div class="grid-container">
+        <div class="grid-container" ref="gameGrid">
           <div 
             v-for="char in characters" 
             :key="char.id" 
             class="char-block"
+            :data-char-id="char.id"
             :class="{ 'revealed': guessedIds.has(char.id) }"
             :style="guessedIds.has(char.id) ? { 
               '--theme-color': char.mainColor || '#42b983', 
@@ -143,6 +147,14 @@ export default {
       gameStarted: false,
       isGameFinished: false,
       nameMap: new Map(), // name string -> char ID
+      duplicateMessage: '', // toast shown at top when a name was already guessed
+      duplicateTimer: null,
+    }
+  },
+  beforeUnmount() {
+    if (this.duplicateTimer) {
+      clearTimeout(this.duplicateTimer)
+      this.duplicateTimer = null
     }
   },
   computed: {
@@ -175,6 +187,11 @@ export default {
       this.gameStarted = true
       this.isGameFinished = false
       this.startTime = Date.now()
+      this.duplicateMessage = ''
+      if (this.duplicateTimer) {
+        clearTimeout(this.duplicateTimer)
+        this.duplicateTimer = null
+      }
       
       this.$nextTick(() => {
         if(this.$refs.answerInput) this.$refs.answerInput.focus()
@@ -206,22 +223,38 @@ export default {
         if (!this.guessedIds.has(charId)) {
           this.guessedIds.add(charId)
           this.userInput = '' // Clear input on success
-          
+
+          // Clear any leftover duplicate-name toast
+          if (this.duplicateTimer) {
+            clearTimeout(this.duplicateTimer)
+            this.duplicateTimer = null
+          }
+          this.duplicateMessage = ''
+
           // Check win condition
           if (this.guessedIds.size === this.characters.length) {
             this.endGame()
+          } else {
+            // Smoothly scroll to the newly revealed character block
+            this.$nextTick(() => {
+              this.scrollToRevealed(charId)
+            })
           }
         } else {
-            // Already guessed this one.
-            // Maybe visual feedback?
-            // For now, if exact match, clear input too? 
-            // Better to keep it if user is typing a longer name that shares prefix? 
-            // Actually if it's an exact match and already guessed, clearing it might be annoying if they meant another char.
-            // But usually names are unique enough.
-            // Let's clear it to be responsive.
-             this.userInput = ''
+            // Already guessed this one → show a toast at the top and clear input.
+            this.userInput = ''
+            this.showDuplicateHint(charId)
         }
       }
+    },
+    showDuplicateHint(charId) {
+      const char = this.characters.find(c => c.id === charId)
+      this.duplicateMessage = `已经输入过：${char ? char.names.zh : ''}`
+      if (this.duplicateTimer) clearTimeout(this.duplicateTimer)
+      this.duplicateTimer = setTimeout(() => {
+        this.duplicateMessage = ''
+        this.duplicateTimer = null
+      }, 2500)
     },
     endGame() {
       this.totalTime = Date.now() - this.startTime
@@ -234,6 +267,27 @@ export default {
         date: new Date().toISOString(),
         score: this.guessedCount
       })
+    },
+    scrollToRevealed(charId) {
+      const grid = this.$refs.gameGrid
+      if (!grid) return
+      const target = grid.querySelector(`[data-char-id="${charId}"]`)
+      if (!target) return
+
+      const rect = target.getBoundingClientRect()
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight
+
+      // sticky header (input area) height — scroll target must land below it
+      const header = this.$refs.stickyHeader
+      const headerHeight = header ? header.getBoundingClientRect().height : 0
+      const gap = 12
+
+      // Already fully visible & not covered by the sticky header → don't interrupt the user
+      if (rect.top >= headerHeight && rect.bottom <= viewportHeight) return
+
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+      const targetY = Math.max(0, scrollTop + rect.top - headerHeight - gap)
+      window.scrollTo({ top: targetY, behavior: 'smooth' })
     },
     restartGame() {
       this.startGame()
@@ -370,6 +424,39 @@ export default {
   background: #f0f0f0;
   transform: scaleX(0);
   transition: transform 0.3s ease;
+}
+
+/* Toast for duplicate name input */
+.duplicate-toast {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  background: white;
+  border: 2px solid var(--primary-color);
+  color: var(--text-main);
+  padding: 10px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  font-weight: 600;
+  font-size: 0.95rem;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: 90vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toast-enter-active,
+.toast-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-10px);
 }
 
 /* Grid */
